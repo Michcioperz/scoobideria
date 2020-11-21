@@ -1,0 +1,39 @@
+use rand::prelude::*;
+use std::str::FromStr;
+use std::convert::TryInto;
+
+grammar;
+
+PositiveInt: usize = r"[1-9][0-9]{0,5}" => usize::from_str(<>).unwrap();
+
+Int: isize = {
+  PositiveInt => <> as isize,
+  "-" <i:PositiveInt> => -(i as isize),
+}
+
+Roll: Vec<isize> = {
+  <count:PositiveInt?> "d" <die:PositiveInt> => rand::distributions::Uniform::new_inclusive(1, die).sample_iter(rand::thread_rng()).take(count.unwrap_or(1)).map(|i| i as isize).collect(),
+  <r:Roll> "+" <i:Int> => r.into_iter().map(|x| x + i).collect(),
+  <r:Roll> "-" <i:Int> => r.into_iter().map(|x| x - i).collect(),
+  <r:Roll> "*" <i:Int> => r.into_iter().map(|x| x * i).collect(),
+  <r:Roll> "/" <i:Int> => r.into_iter().map(|x| x / i).collect(),
+  <r:Roll> "%" <i:Int> => r.into_iter().map(|x| x % i).collect(),
+  <r:Roll> "^" <i:Int> => r.into_iter().map(|x| x.pow(i.try_into().unwrap_or(0))).collect(),
+  <r:Roll> "sum" => vec![r.into_iter().sum()],
+  <r:Roll> "min" => vec![r.into_iter().min().unwrap_or(0)],
+  <r:Roll> "max" => vec![r.into_iter().max().unwrap_or(0)],
+  <r:Roll> "count" => vec![r.len() as isize],
+  <r:Roll> "sort" => { let mut r = r; r.sort_unstable(); r },
+  <r:Roll> "rev" => r.into_iter().rev().collect(),
+  <r:Roll> ">" <i:Int> => r.into_iter().filter(|x| *x > i).collect(),
+  <r:Roll> ">=" <i:Int> => r.into_iter().filter(|x| *x >= i).collect(),
+  <r:Roll> "<" <i:Int> => r.into_iter().filter(|x| *x < i).collect(),
+  <r:Roll> "<=" <i:Int> => r.into_iter().filter(|x| *x <= i).collect(),
+  <r:Roll> "==" <i:Int> => r.into_iter().filter(|x| *x == i).collect(),
+  <r:Roll> "!=" <i:Int> => r.into_iter().filter(|x| *x != i).collect(),
+  <r:Roll> "[" <i:PositiveInt?> ":" <n:PositiveInt?> "]" => r.into_iter().skip(i.unwrap_or(0)).take(n.unwrap_or(std::usize::MAX) - i.unwrap_or(0)).collect(),
+};
+
+pub Query: Vec<isize> = {
+  ("/roll" "@scoobideria_bot"?)? <r:Roll> => r,
+};
