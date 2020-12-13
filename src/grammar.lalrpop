@@ -13,6 +13,10 @@ Int: isize = {
 
 Roll: Vec<isize> = {
   <count:PositiveInt?> "d" <die:PositiveInt> => rand::distributions::Uniform::new_inclusive(1, die).sample_iter(rand::thread_rng()).take(count.unwrap_or(1)).map(|i| i as isize).collect(),
+  <count:PositiveInt?> "doo" => {
+    let (l, r) = rand::distributions::Uniform::new_inclusive(1, 6).sample_iter(rand::thread_rng()).take(count.unwrap_or(1) * 2).enumerate().partition::<Vec<_>,_>(|(i, _)| i % 2 == 0);
+    l.into_iter().zip(r.into_iter()).map(|((_, l), (_, r))| l + r).collect()
+  },
   <r:Roll> "+" <i:Int> => r.into_iter().map(|x| x + i).collect(),
   <r:Roll> "-" <i:Int> => r.into_iter().map(|x| x - i).collect(),
   <r:Roll> "*" <i:Int> => r.into_iter().map(|x| x * i).collect(),
