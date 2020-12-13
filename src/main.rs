@@ -4,18 +4,18 @@ use telegram_bot::prelude::*;
 
 lalrpop_mod!(pub grammar);
 
-fn answer(query: &str) -> String {
+pub fn answer(query: &str) -> Result<String, String> {
     match grammar::QueryParser::new().parse(query) {
         Ok(v) => {
             let sum: isize = v.iter().sum();
             let msg = format!("{} {:?}", sum, v);
             if msg.len() > 4096 {
-                format!("{} [too long to list]", sum)
+                Ok(format!("{} [too long to list]", sum))
             } else {
-                msg
+                Ok(msg)
             }
         }
-        Err(e) => format!("{}", e),
+        Err(e) => Err(format!("{}", e)),
     }
 }
 
@@ -29,10 +29,12 @@ async fn main() -> Result<(), telegram_bot::Error> {
         match update?.kind {
             telegram_bot::UpdateKind::Message(message) => {
                 if let telegram_bot::MessageKind::Text { ref data, .. } = message.kind {
-                    api.send(message.text_reply(answer(data))).await?;
+                    if let Ok(s) = answer(data) {
+                        api.send(message.text_reply(s)).await?;
+                    }
                 }
-            },
-            _ => { },
+            }
+            _ => {}
         }
     }
     Ok(())
