@@ -5,18 +5,9 @@ use telegram_bot::prelude::*;
 lalrpop_mod!(pub grammar);
 
 pub fn answer(query: &str) -> Result<String, String> {
-    match grammar::QueryParser::new().parse(query) {
-        Ok(v) => {
-            let sum: isize = v.iter().sum();
-            let msg = format!("{} {:?}", sum, v);
-            if msg.len() > 4096 {
-                Ok(format!("{} [too long to list]", sum))
-            } else {
-                Ok(msg)
-            }
-        }
-        Err(e) => Err(format!("{}", e)),
-    }
+    grammar::QueryParser::new()
+        .parse(query)
+        .map_err(|e| format!("{}", e))
 }
 
 #[tokio::main]

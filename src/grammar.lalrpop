@@ -7,7 +7,7 @@ grammar;
 PositiveInt: usize = r"[1-9][0-9]{0,5}" => usize::from_str(<>).unwrap();
 
 Int: isize = {
-  PositiveInt => <> as isize,
+  "+"? <i:PositiveInt> => i as isize,
   "-" <i:PositiveInt> => -(i as isize),
 }
 
@@ -38,6 +38,31 @@ Roll: Vec<isize> = {
   <r:Roll> "[" <i:PositiveInt?> ":" <n:PositiveInt?> "]" => r.into_iter().skip(i.unwrap_or(0)).take(n.unwrap_or(std::usize::MAX) - i.unwrap_or(0)).collect(),
 };
 
-pub Query: Vec<isize> = {
-  ("/roll" "@scoobideria_bot"?)? <r:Roll> => r,
+pub RollResult: String = {
+  <v:Roll> => {
+    let sum: isize = v.iter().sum();
+    let msg = format!("{} {:?}", sum, v);
+    if msg.len() > 4096 {
+      format!("{} [too long to list]", sum)
+    } else {
+      msg
+    }
+  },
+  "mod" <i:Int> => {
+    let count: usize = i.saturating_abs() as usize + 1;
+    let (l, r) = rand::distributions::Uniform::new_inclusive(1, 6).sample_iter(rand::thread_rng()).take(count * 2).enumerate().partition::<Vec<_>,_>(|(i, _)| i % 2 == 0);
+    let v: Vec<usize> = l.into_iter().zip(r.into_iter()).map(|((_, l), (_, r))| l + r).collect();
+    let the_important_one = if i < 0 { v.iter().min().unwrap() } else { v.iter().max().unwrap() };
+    let result = match *the_important_one {
+      2..=5 => "failure",
+      6..=7 => "partial success",
+      8..=12 => "success",
+      _ => unreachable!(),
+    };
+    format!("{}({}) {:?}", result, the_important_one, v)
+  },
+};
+
+pub Query: String = {
+  ("/roll" "@scoobideria_bot"?)? <r:RollResult> => r,
 };
