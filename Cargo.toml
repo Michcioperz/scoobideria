@@ -16,3 +16,9 @@ pyo3 = { version = "0.13.2", features = ["extension-module"] }
 
 [build-dependencies]
 lalrpop = { version = "0.19.3", features = ["lexer"] }
+
+[package.metadata.maturin]
+requires-dist = ["python-telegram-bot~=13.4.1"]
+
+[package.metadata.maturin.scripts]
+scoobideria = ["scoobideria.main:main"]
