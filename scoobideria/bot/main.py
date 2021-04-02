@@ -4,7 +4,7 @@ import os
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
-from .dice import answer
+from scoobideria import answer
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

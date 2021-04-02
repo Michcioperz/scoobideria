@@ -6,7 +6,7 @@ edition = "2018"
 build = "build.rs"
 
 [lib]
-name = "dice"
+name = "scoobideria"
 crate-type = ["cdylib"]
 
 [dependencies]
