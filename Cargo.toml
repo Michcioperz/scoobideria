@@ -9,9 +9,6 @@ build = "build.rs"
 name = "scoobidice"
 crate-type = ["cdylib"]
 
-[profile.release]
-lto = true
-
 [dependencies]
 lalrpop-util = { version = "0.19.3", features = ["lexer"] }
 rand = "0.8.0"
