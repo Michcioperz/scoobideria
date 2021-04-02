@@ -21,4 +21,4 @@ lalrpop = { version = "0.19.3", features = ["lexer"] }
 requires-dist = ["python-telegram-bot~=13.4.1"]
 
 [package.metadata.maturin.scripts]
-scoobideria = ["scoobideria.main:main"]
+scoobideria = "scoobideria.main:main"
