@@ -13,7 +13,7 @@ fn answer(query: String) -> PyResult<String> {
 }
 
 #[pymodule]
-fn dice(_py: Python, m: &PyModule) -> PyResult<()> {
+fn scoobideria(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(answer, m)?)?;
     Ok(())
 }
