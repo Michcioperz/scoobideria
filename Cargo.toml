@@ -5,15 +5,17 @@ authors = ["Michał Sidor <public+git@meekchopp.es>"]
 edition = "2018"
 build = "build.rs"
 
+[lib]
+name = "scoobidice"
+crate-type = ["cdylib"]
+
 [profile.release]
 lto = true
 
 [dependencies]
-telegram-bot = "0.8.0"
-tokio = { version = "0.2", features = ["macros", "fs"] }
 lalrpop-util = { version = "0.19.3", features = ["lexer"] }
-futures = "0.3.8"
 rand = "0.8.0"
+pyo3 = { version = "0.13.2", features = ["extension-module"] }
 
 [build-dependencies]
 lalrpop = { version = "0.19.3", features = ["lexer"] }
